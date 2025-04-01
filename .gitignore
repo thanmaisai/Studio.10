@@ -22,3 +22,10 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Decap CMS local backup
+# Avoids committing temporary local states from the CMS UI
+public/admin/config.yml.local
+
+# Environment variables
+.env*
