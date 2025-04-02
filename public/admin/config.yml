@@ -3,34 +3,43 @@
 # Backend connects Decap CMS to your Git repository
 backend:
   name: github # Or use gitlab, git-gateway, etc.
-  repo: your-github-username/your-repo-name # IMPORTANT: Replace with your GitHub username/repo
+  repo: thanmaisai/Studio.10 # IMPORTANT: Replace with your GitHub username/repo
   branch: main # Or master, or whichever branch you use as primary
 
 # Media files configuration - We'll configure Cloudinary here later
-media_folder: "public/uploads/images" # Where Decap *thinks* it's storing files relative to project root
-public_folder: "/uploads/images" # Public path to access the media files from the built site
+# media_folder: "public/uploads/images" # Where Decap *thinks* it's storing files relative to project root
+# public_folder: "/uploads/images" # Public path to access the media files from the built site
+
+media_library:
+  name: cloudinary
+  config:
+    cloud_name: "${{ env.CLOUDINARY_CLOUD_NAME }}"
+    api_key: "${{ env.CLOUDINARY_API_KEY }}"
+    upload_preset: "${{ env.CLOUDINARY_UPLOAD_PRESET_NAME }}"
 
 # Collections define the types of content you can manage
 collections:
-  - name: "pages" # Example: For pages like 'About'
+  - name: "pages"
     label: "Pages"
-    files:
-      - name: "about"
-        label: "About Page"
-        file: "src/content/pages/about.md" # Path where the content file will be saved
-        fields:
-          - { label: "Title", name: "title", widget: "string" }
-          - { label: "Body", name: "body", widget: "markdown" }
-
-  - name: "photos" # Example: For your photo gallery items
-    label: "Photos"
-    folder: "src/content/photos" # Path where photo markdown files will be saved
-    create: true # Allow creating new photos
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}" # Filename format
+    folder: "src/content/pages"
+    create: true
+    slug: "{{slug}}"
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      # We'll add the image field linked to Cloudinary later
-      - { label: "Image", name: "image", widget: "image" } # Basic image widget for now
-      - { label: "Categories", name: "categories", widget: "list", field: { label: "Category", name: "category", widget: "string" } }
+      - { label: "Publish Date", name: "date", widget: "datetime" }
+      # Example image field using Cloudinary Media Library
+      - { label: "Featured Image", name: "thumbnail", widget: "image", media_library: { config: { multiple: false }}, required: false }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: "photos"
+    label: "Photos"
+    folder: "src/content/photos"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Publish Date", name: "date", widget: "datetime" }
+      # Configure the 'photo' field to use the Cloudinary Media Library
+      - { label: "Photo", name: "photo", widget: "image", media_library: { config: { multiple: false }} }
+      - { label: "Category", name: "category", widget: "select", options: ["Nature", "Vehicle", "People", "Abstract", "Other"] }
       - { label: "Description", name: "description", widget: "text", required: false }
-      - { label: "Date Taken", name: "date", widget: "datetime", required: false }
